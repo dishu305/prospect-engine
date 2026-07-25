@@ -33,7 +33,7 @@ The outreach generator uses a verified contact's remit and the matched account's
 
 - `app.js` defines the account evidence, ICP scores, first-party source links, verified-contact records, suppression logic, and `emailFor` generation function.
 - `index.html` and `styles.css` provide the brief input, staged workflow view, evidence review, contact details, outreach output, and JSON export action.
-- `server.js` serves the project as a dependency-free web application.
+- `scripts/local-server.js` serves the project locally without dependencies.
 - `thought-process.html` provides a standalone visual explanation of the workflow and its verification rules.
 
 ## Demo / Results

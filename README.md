@@ -5,7 +5,7 @@ Evidence-first outbound account research for FlytBase's Latin American mining ca
 ## Run locally
 
 ```powershell
-node server.js
+node scripts/local-server.js
 ```
 
 Open `http://localhost:3000`.
@@ -20,4 +20,4 @@ Open `http://localhost:3000`.
 
 ## Production research configuration
 
-The checked research cache powers the repeatable GitHub Pages demonstration. For a live-research deployment, deploy this project to Vercel and configure `TAVILY_API_KEY` for web research and `APOLLO_API_KEY` for licensed contact enrichment in the Vercel project environment variables. `server.js` exposes `/api/research-status` so a deployment can report whether those credentials are configured. Never commit real credentials.
+The checked research cache powers the repeatable GitHub Pages demonstration. For a live-research deployment, deploy this project to Vercel and configure `TAVILY_API_KEY` for web research and `APOLLO_API_KEY` for licensed contact enrichment in the Vercel project environment variables. `api/research-status.js` reports whether those credentials are configured. Never commit real credentials.
