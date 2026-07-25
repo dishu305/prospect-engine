@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prospect Engine - Thought Process</title>
+  <style>
+    :root{--ink:#16212b;--muted:#66747e;--line:#d9e0e3;--paper:#f6f8f7;--green:#08755a;--lime:#b8f15b}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:52px 24px}p{color:var(--muted);max-width:760px}.eyebrow{font-size:11px;letter-spacing:1.3px;color:var(--green);font-weight:800}h1{font-size:42px;line-height:1.1;margin:8px 0 14px;letter-spacing:0}h2{font-size:18px;margin:0 0 9px}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:38px 0}.node{background:#fff;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:6px;padding:17px;min-height:190px}.node b{display:block;color:var(--green);font-size:11px;letter-spacing:1px;margin-bottom:11px}.node p{font-size:12px;margin:0}.arrow{display:none}.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.rule{background:#fff;border:1px solid var(--line);border-radius:6px;padding:21px}.rule ul{padding-left:18px;margin:0}.rule li{margin:8px 0;color:#46545d}.fail{border-left:4px solid #e28239}.back{display:inline-block;margin-top:34px;color:var(--green);text-decoration:none;font-weight:700}@media(max-width:760px){.flow{grid-template-columns:1fr}.node{min-height:0}h1{font-size:33px}.rule-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main>
+  <p class="eyebrow">FLYTBASE BDR HACKATHON / THOUGHT PROCESS</p>
+  <h1>Evidence before outreach.</h1>
+  <p>This workflow turns a campaign brief into an inspectable account and outreach queue. Each stage has a verification gate, so unknown facts do not become fabricated prospect data.</p>
+  <section class="flow" aria-label="Prospecting workflow">
+    <article class="node"><b>INPUT / ICP MODEL</b><h2>Read the brief</h2><p>Use the target vertical, SQM reference account, call-booking goal, and FlytBase angle to define the ICP.</p></article>
+    <article class="node"><b>STAGE 1</b><h2>Account identification</h2><p>Find LATAM miners, then score commodity, footprint, operational complexity, and public evidence against SQM.</p></article>
+    <article class="node"><b>STAGE 2</b><h2>Contact discovery</h2><p>Find Operations, HSE, and Site leaders. Retain a named contact only when a company-owned source verifies their role.</p></article>
+    <article class="node"><b>STAGE 3</b><h2>Account research</h2><p>Synthesize recent news, operating footprint, and technology or safety signals into a cited account brief.</p></article>
+    <article class="node"><b>STAGE 4</b><h2>Personalized email</h2><p>Use the verified remit and research evidence to generate outreach, then expose its inputs in the output queue.</p></article>
+  </section>
+  <section class="rule-grid">
+    <article class="rule"><h2>Decision rules</h2><ul><li>First-party public evidence is the minimum standard for a factual claim.</li><li>Account fit is separate from contact verification.</li><li>Publicly unverified email addresses are never inferred.</li><li>Every email must name the exact evidence that shaped it.</li></ul></article>
+    <article class="rule fail"><h2>Safe failure path</h2><p>When account research succeeds but no target-role contact can be verified, retain the account and suppress the persona and email. Flag it for compliant enrichment or deeper first-party verification, then rerun.</p></article>
+  </section>
+  <a class="back" href="index.html">Open Prospect Engine</a>
+</main></body></html>
