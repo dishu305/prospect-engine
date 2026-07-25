@@ -1,5 +1,7 @@
 # FlytBase BDR Hackathon Submission
 
+> Replace this file with the version generated from the exact prompt released in the hackathon submission workspace. This interim version documents the shipped system.
+
 ## System access
 
 Run locally with:
