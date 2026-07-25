@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prospect Engine | FlytBase</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header><div class="brand"><span class="mark">F</span><span>Prospect Engine</span></div><span class="tag">OUTBOUND INTELLIGENCE</span><div class="status"><i></i> Evidence-first workflow</div></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">LATAM MINING / CAMPAIGN 01</p><h1>Find the accounts where autonomous inspection has a reason to exist.</h1><p class="lede">A research-led outbound workflow for FlytBase. Every recommendation carries the source evidence, contact verification status, and personalized email rationale behind it.</p></div><button id="run" class="primary"><span class="play">▶</span> Run prospecting workflow</button></section>
+    <section class="brief panel"><div class="panel-head"><h2>Campaign brief</h2><span class="live-dot">READY</span></div><div class="brief-grid"><label>Target vertical<input id="vertical" value="Large-scale lithium, copper, and iron ore mining in Latin America"></label><label>Reference account<input id="reference" value="Sociedad Química y Minera de Chile (SQM)"></label><label>Conversion goal<input id="goal" value="Book discovery calls with Operations, HSE, or Site leaders"></label><label>FlytBase angle<input id="angle" value="Autonomous drone inspection for hazardous, 24/7 extraction sites"></label></div></section>
+    <section id="pipeline" class="pipeline" aria-live="polite"><article data-stage="1"><b>01</b><div><strong>Model ICP</strong><span>Compare scale, commodities and operating context</span></div><em>Waiting</em></article><article data-stage="2"><b>02</b><div><strong>Discover accounts</strong><span>Score verified public signals</span></div><em>Waiting</em></article><article data-stage="3"><b>03</b><div><strong>Find contacts</strong><span>Verify role from first-party leadership pages</span></div><em>Waiting</em></article><article data-stage="4"><b>04</b><div><strong>Generate outreach</strong><span>Use cited account research, not merge fields</span></div><em>Waiting</em></article></section>
+    <div id="empty" class="empty"><div class="empty-icon">◎</div><h2>Ready to investigate</h2><p>Run the workflow to create an evidence-backed account plan and outreach queue.</p></div>
+    <section id="results" hidden>
+      <div class="results-head"><div><p class="eyebrow">RUN RESULTS</p><h2 id="summary">0 matched accounts</h2></div><button id="export" class="icon-btn" title="Export results as JSON">↓</button></div>
+      <div id="metrics" class="metrics"></div><div id="accounts" class="accounts"></div>
+    </section>
+  </main>
+  <footer><span>Public-source research only. No guessed emails. Verify before sending.</span><a href="THOUGHT_PROCESS.md">Workflow design</a><a href="Submission.md">Submission notes</a></footer>
+  <script src="app.js"></script>
+</body></html>
