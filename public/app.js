@@ -59,6 +59,19 @@ function renderAccounts(accounts) {
   }).join('');
 }
 
+function showSanitizedQueries(list) {
+  const pane = document.getElementById('sanitized-queries');
+  const pre = document.getElementById('sanitized-pre');
+  if (!pane || !pre) return;
+  if (!Array.isArray(list) || list.length === 0) {
+    pane.hidden = true;
+    pre.textContent = '';
+    return;
+  }
+  pane.hidden = false;
+  pre.textContent = list.map(q => `${q.service}: ${q.query}`).join('\n\n');
+}
+
 function showError(message) {
   $('#empty').hidden = false;
   $('#results').hidden = true;
@@ -105,6 +118,7 @@ async function runResearch() {
 
     latestResults = payload;
     renderAccounts(payload.accounts || []);
+    showSanitizedQueries(payload.sanitizedQueries || []);
     setPipelineState('done');
     setStatus('LIVE RESEARCH COMPLETE', 'live');
   } catch (error) {

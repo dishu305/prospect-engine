@@ -55,6 +55,9 @@ function sanitizeQuery(query) {
   return `${truncated.trim()}...`;
 }
 
+// Collect sanitized queries for debugging / transparency in responses
+const SANITIZED_QUERIES = [];
+
 function inferCompanyName(title = '', content = '') {
   const raw = `${title} ${content}`.trim();
   const clean = raw.split('|')[0].split(' - ')[0].split(' — ')[0].split(':')[0].trim();
@@ -107,6 +110,7 @@ async function tavilySearch(query, { maxResults = 5, includeRawContent = false }
   if (!apiKey) throw new Error('TAVILY_API_KEY is required for live research');
 
   const safeQuery = sanitizeQuery(query);
+  SANITIZED_QUERIES.push({ service: 'tavily', query: safeQuery });
 
   const response = await fetch('https://api.tavily.com/search', {
     method: 'POST',
@@ -155,6 +159,8 @@ function makeSignals(results, company) {
 async function apolloSearchContacts(companyName, titles) {
   const apiKey = process.env.APOLLO_API_KEY;
   if (!apiKey) return [];
+
+  SANITIZED_QUERIES.push({ service: 'apollo', query: `${companyName} ${titles.join(' ')}`.slice(0, 300) });
 
   const endpoints = [
     'https://api.apollo.io/v1/mixed_people/search',
@@ -351,7 +357,8 @@ module.exports = async function handler(request, response) {
         apollo: Boolean(process.env.APOLLO_API_KEY)
       },
       brief,
-      accounts
+      accounts,
+      sanitizedQueries: SANITIZED_QUERIES
     });
   } catch (error) {
     sendJson(response, 500, {

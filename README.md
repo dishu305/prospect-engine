@@ -21,3 +21,13 @@ Open `http://localhost:3000`.
 ## Production research configuration
 
 This app now runs as a live, input-driven research agent on Vercel. Configure `TAVILY_API_KEY` for web research and `APOLLO_API_KEY` for licensed contact enrichment in the Vercel project environment variables. `api/research-status.js` reports whether those credentials are configured. Never commit real credentials.
+
+Quick smoke test (local, mocked providers):
+
+```powershell
+node test_research.js
+```
+
+This will run a local harness that mocks Tavily/Apollo responses and verifies the handler path. Use this to sanity-check the codebase without real API keys.
+
+Note: the server truncates/sanitizes long search queries to accommodate Tavily's 400-character limit; the UI exposes the sanitized queries under "Sanitized search queries" in the results panel for transparency.
