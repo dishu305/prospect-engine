@@ -1,28 +1,53 @@
-# FlytBase BDR Hackathon Submission
+# Submission
 
-> Replace this file with the version generated from the exact prompt released in the hackathon submission workspace. This interim version documents the shipped system.
+## What I Built
 
-## System access
+Prospect Engine is an evidence-first outbound prospecting workflow for FlytBase's Latin American mining campaign. It accepts the campaign brief anchored on SQM and produces a prioritized account list, verified target contacts, source-backed account research, and personalized outbound drafts for Operations, HSE, and Site leadership.
 
-Run locally with:
+The system is designed to prevent unsupported prospect data from reaching outreach. Each account shows its ICP rationale and public-source evidence. Contacts are retained only when a first-party company page verifies the person's role; otherwise the record is kept as an enrichment task and no email is generated.
 
-```powershell
-node server.js
+## Architecture / Flow
+
+```mermaid
+flowchart TD
+  A[Campaign brief: target vertical, SQM reference, goal, FlytBase angle] --> B[Stage 1: Account identification]
+  B --> C{First-party evidence supports ICP fit?}
+  C -->|Yes| D[Score and retain account]
+  C -->|No| E[Exclude or flag account]
+  D --> F[Stage 2: Contact discovery]
+  F --> G{Target role and name verified?}
+  G -->|Yes| H[Retain verified contact]
+  G -->|No| I[Suppress persona and flag enrichment]
+  H --> J[Stage 3: Account research]
+  J --> K[Stage 4: Personalized email generation]
+  K --> L[Account list, contact list, research briefs, and outreach queue]
 ```
 
-Open `http://localhost:3000`.
+## Why This Solves The Brief
 
-## What the system does
+The account model uses SQM's relevant operating context: large-scale Latin American mining, multi-site and high-consequence infrastructure, and hazardous or continuous operations where autonomous inspection is relevant. The workflow then connects each qualified account's current operating signals to FlytBase's autonomous drone inspection angle.
 
-Prospect Engine converts a campaign brief into an account queue, evidence-backed research briefs, verified target contacts, and generated outbound drafts. It is deliberately evidence-first: citations are shown with each account; persona or email data is never guessed; and the rendered outreach exposes its personalization inputs.
+The outreach generator uses a verified contact's remit and the matched account's research signals rather than a generic mail-merge field. The rendered result includes the exact personalization inputs next to each generated email.
 
-## Implementation
+## Evidence From The Codebase
 
-- `app.js` contains the inspectable ICP scoring inputs, evidence cache, role verification decisions, and email generation function.
-- `index.html` and `styles.css` implement the operator workflow and results review.
-- `server.js` is a zero-dependency local web server.
-- `THOUGHT_PROCESS.md` contains the process map and failure policy.
+- `app.js` defines the account evidence, ICP scores, first-party source links, verified-contact records, suppression logic, and `emailFor` generation function.
+- `index.html` and `styles.css` provide the brief input, staged workflow view, evidence review, contact details, outreach output, and JSON export action.
+- `server.js` serves the project as a dependency-free web application.
+- `thought-process.html` provides a standalone visual explanation of the workflow and its verification rules.
 
-## Known limitation and mitigation
+## Demo / Results
 
-This demo uses a checked public-source research cache so it remains repeatable during a live review. A production deployment should refresh the cache through a compliant search/news provider and a licensed contact-enrichment provider. Any unavailable verification remains a blocked record, never fabricated output.
+The deployed workflow completed all four stages and produced:
+
+- 3 matched accounts: Vale, Nexa Resources, and Antofagasta Minerals.
+- 4 verified named contacts: Carlos Medeiros, Rafael Bittar, Leonardo Nunes Coelho, and Fernando Demuner.
+- 5 linked first-party public sources supporting the account research.
+- 0 guessed email addresses.
+- 1 intentional safe-failure record: Antofagasta Minerals remains a qualified account, while its Site Operations / HSE contact is marked `Needs enrichment` because no named target-role persona was verified from the available first-party sources.
+
+The account cards show ICP scores of 94 for Vale, 91 for Nexa Resources, and 89 for Antofagasta Minerals. Verified contacts receive a generated outbound draft; the suppressed record does not.
+
+## Notes And Limitations
+
+The current implementation uses a checked public-source research cache, which makes the demonstrated workflow repeatable. A production version would refresh account evidence through a compliant research/news provider and use a licensed enrichment provider where a verified target contact is unavailable. The current safe behavior remains the same: no inferred email addresses, invented people, or outreach draft for an unverified persona.
