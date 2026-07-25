@@ -34,6 +34,27 @@ function firstString(value) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+const TAVILY_MAX_QUERY_LENGTH = 400;
+
+function sanitizeQuery(query) {
+  if (!query) return '';
+  let q = String(query).trim();
+  if (q.length <= TAVILY_MAX_QUERY_LENGTH) return q;
+
+  // Try to keep the first meaningful sentence or clause under the limit.
+  const limit = TAVILY_MAX_QUERY_LENGTH - 10; // small buffer for ellipses or safety
+  const sentenceEnd = q.indexOf('. ');
+  if (sentenceEnd > 40 && sentenceEnd < limit) {
+    return q.slice(0, sentenceEnd + 1);
+  }
+
+  // Otherwise fall back to a safe truncate at word boundary.
+  let truncated = q.slice(0, limit);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > Math.floor(limit * 0.6)) truncated = truncated.slice(0, lastSpace);
+  return `${truncated.trim()}...`;
+}
+
 function inferCompanyName(title = '', content = '') {
   const raw = `${title} ${content}`.trim();
   const clean = raw.split('|')[0].split(' - ')[0].split(' — ')[0].split(':')[0].trim();
@@ -85,12 +106,14 @@ async function tavilySearch(query, { maxResults = 5, includeRawContent = false }
   const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey) throw new Error('TAVILY_API_KEY is required for live research');
 
+  const safeQuery = sanitizeQuery(query);
+
   const response = await fetch('https://api.tavily.com/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       api_key: apiKey,
-      query,
+      query: safeQuery,
       search_depth: 'advanced',
       max_results: maxResults,
       include_answer: false,
