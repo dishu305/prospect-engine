@@ -1,25 +1,129 @@
-const source = (label, url) => ({ label, url });
-// This is the inspectable research cache. Each claim is linked to a first-party public source.
-const accounts = [
-  { name: 'Vale', country: 'Brazil', commodity: 'Iron ore', score: 94, fit: 'SQM-scale, multi-site Latin American miner with iron ore, pellet and logistics operations. The scale and distributed critical infrastructure make repeatable remote inspection relevant.', signals: ['Carlos Medeiros oversees Vale mining, pellet production and logistics as Executive VP Operations.', 'Vale publicly identifies a technical EVP focused on dam and tailings management, a high-consequence inspection context.'], news: 'Leadership and operational remit are current on Vale’s executive leadership page.', tech: 'Strong fit: mining, pellet and logistics operations create recurring inspection routes across hazardous infrastructure.', sources: [source('Vale leadership', 'https://www.vale.com/leadership')], contacts: [{ name: 'Carlos Medeiros', role: 'Executive Vice President - Operations', verification: 'Verified on Vale leadership page', link: 'https://www.vale.com/leadership' }, { name: 'Rafael Bittar', role: 'Executive Vice President - Technical', verification: 'Verified on Vale leadership page; tailings-management background', link: 'https://www.vale.com/leadership' }] },
-  { name: 'Nexa Resources', country: 'Brazil & Peru', commodity: 'Zinc, copper, lead', score: 91, fit: 'Latin American mining and metallurgy operator with five mines and three smelters across Brazil and Peru. It combines hazardous underground mining with processing infrastructure.', signals: ['Nexa reports eight operations: five mines and three smelters, including Cerro Lindo, Peru’s largest underground zinc mine.', 'Nexa reported US$352m in 2025 CAPEX and record quarterly production from Aripuana.'], news: '2025 performance and 2026 production results are published on Nexa’s public site.', tech: 'Strong fit: underground mine and smelter footprint gives Operations a repeatable safety and reliability inspection problem.', sources: [source('Nexa operations', 'https://www.nexaresources.com/en/about-us/'), source('Nexa leadership', 'https://ri.nexaresources.com/corporate-governance/leadership-team/')], contacts: [{ name: 'Leonardo Nunes Coelho', role: 'Senior Vice President of Mining Operations', verification: 'Verified on Nexa leadership page', link: 'https://ri.nexaresources.com/corporate-governance/leadership-team/' }, { name: 'Fernando Demuner', role: 'Smelting Operations Officer', verification: 'Verified on Nexa leadership page', link: 'https://ri.nexaresources.com/corporate-governance/leadership-team/' }] },
-  { name: 'Antofagasta Minerals', country: 'Chile', commodity: 'Copper', score: 89, fit: 'A Chile-based top-ten copper producer operating four open-pit mines. Its geography, mining scale, and 24/7 processing profile closely parallel SQM’s operational setting.', signals: ['Antofagasta operates Los Pelambres, Centinela, Antucoya and Zaldívar in Chile.', 'Los Pelambres produced 319.6kt copper in 2024 and employs a workforce of 7,711; Centinela produced 223.8kt and has 8,992 workers.', 'The group has reported field leadership, contractor-management and critical-risk-control initiatives.'], news: 'The company reported a July 2026 weather-driven operational shutdown and controlled restart at Los Pelambres.', tech: 'Strong fit: large open-pit sites, processing plants, tailings and weather exposure create a concrete case for autonomous site visibility.', sources: [source('Antofagasta sustainability report', 'https://sr.antofagasta.co.uk/'), source('Los Pelambres update', 'https://www.antofagasta.co.uk/investors/news/2026/los-pelambres-operational-update/')], contacts: [{ name: 'Contact research required', role: 'Site Operations / HSE leader', verification: 'No named target-role contact was verified from a first-party public leadership source. The workflow intentionally suppresses a guessed persona.', link: 'https://www.antofagasta.co.uk/about-us/our-approach/our-approach-to-risk/' }] }
-];
+const $ = selector => document.querySelector(selector);
 
-const $ = s => document.querySelector(s);
-function emailFor(account, contact) {
-  const first = contact.name.split(' ')[0];
-  const evidence = account.name === 'Vale' ? 'Vale’s mining, pellet and logistics remit' : account.name === 'Nexa Resources' ? 'Nexa’s five mines and three smelters across Brazil and Peru' : 'the scale of your Chilean copper operations';
-  const focus = account.name === 'Antofagasta Minerals' ? 'weather resilience, tailings and plant visibility' : 'safer, more frequent inspection of critical assets';
-  return { subject: `${account.name}: autonomous inspection at operating scale`, body: `Hi ${first},\n\nI noticed ${evidence}. That is the kind of distributed, high-consequence operating environment where teams are asked to improve ${focus} without adding contractor exposure.\n\nFlytBase helps industrial teams run autonomous drone operations from a central control layer. Shell, Anglo American and CSX use FlytBase in mission-critical environments where inspections need to happen consistently, including outside normal access windows.\n\nWould a 20-minute conversation on how this could apply to ${account.name}'s operations be useful?\n\nBest,\n[Sender]` };
+let latestResults = null;
+
+function getBrief() {
+  return {
+    vertical: $('#vertical').value.trim(),
+    reference: $('#reference').value.trim(),
+    goal: $('#goal').value.trim(),
+    angle: $('#angle').value.trim()
+  };
 }
-function render() {
-  $('#empty').hidden = true; $('#results').hidden = false;
-  const contacts = accounts.flatMap(a => a.contacts).filter(c => !c.name.startsWith('Contact'));
+
+function setStatus(text, tone = 'ready') {
+  const status = $('.live-dot');
+  if (!status) return;
+  status.textContent = text;
+  status.dataset.tone = tone;
+}
+
+function setPipelineState(state) {
+  const stages = [...document.querySelectorAll('[data-stage]')];
+  stages.forEach(stage => {
+    const label = stage.querySelector('em');
+    stage.className = '';
+    if (!label) return;
+    if (state === 'running') label.textContent = 'Running';
+    else if (state === 'done') { stage.className = 'done'; label.textContent = 'Complete'; }
+    else if (state === 'error') { stage.className = 'active'; label.textContent = 'Needs attention'; }
+    else label.textContent = 'Waiting';
+  });
+
+  if (state === 'running') {
+    stages.forEach((stage, index) => {
+      setTimeout(() => {
+        stage.className = 'active';
+        const label = stage.querySelector('em');
+        if (label) label.textContent = 'Running';
+      }, index * 220);
+    });
+  }
+}
+
+function renderAccounts(accounts) {
+  const contacts = accounts.flatMap(account => account.contacts || []).filter(contact => !contact.name.startsWith('Contact'));
+  $('#empty').hidden = true;
+  $('#results').hidden = false;
   $('#summary').textContent = `${accounts.length} matched accounts, ${contacts.length} verified contacts`;
-  $('#metrics').innerHTML = `<div><strong>${accounts.length}</strong><span>Accounts scored</span></div><div><strong>${contacts.length}</strong><span>Verified named contacts</span></div><div><strong>${accounts.reduce((n,a)=>n+a.sources.length,0)}</strong><span>First-party sources</span></div><div><strong>0</strong><span>Guessed emails</span></div>`;
-  $('#accounts').innerHTML = accounts.map((a,i) => `<article class="account"><div class="account-top"><div><span class="rank">MATCH ${String(i+1).padStart(2,'0')}</span><h3>${a.name}</h3><p>${a.country} <span>·</span> ${a.commodity}</p></div><div class="score"><strong>${a.score}</strong><small>ICP score</small></div></div><div class="account-grid"><div><h4>Why it fits</h4><p>${a.fit}</p><h4>Evidence</h4><ul>${a.signals.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><h4>Research brief</h4><p><b>Recent signal:</b> ${a.news}</p><p><b>FlytBase relevance:</b> ${a.tech}</p><div class="sources">${a.sources.map(s=>`<a target="_blank" rel="noreferrer" href="${s.url}">↗ ${s.label}</a>`).join('')}</div></div></div><div class="contacts"><h4>Target contacts</h4>${a.contacts.map((c,j)=>{ const e=emailFor(a,c); const safe = !c.name.startsWith('Contact'); return `<details ${safe && i===0 && j===0 ? 'open':''}><summary><span class="person">${safe ? c.name : 'No verified persona'}</span><span>${c.role}</span><span class="verified">${safe ? 'Verified' : 'Needs enrichment'}</span></summary><div class="contact-body"><p><b>Verification:</b> <a target="_blank" rel="noreferrer" href="${c.link}">${c.verification}</a></p>${safe ? `<div class="email"><div><span>GENERATED OUTREACH</span><b>Subject: ${e.subject}</b></div><pre>${e.body}</pre><p class="rationale">Personalization inputs: ${a.signals.slice(0,2).join(' ')}</p></div>` : '<p class="suppressed">No email generated. A named target contact must be confirmed from an authoritative public source before outreach is drafted.</p>'}</div></details>`}).join('')}</div></article>`).join('');
+  $('#metrics').innerHTML = [
+    `<div><strong>${accounts.length}</strong><span>Accounts scored</span></div>`,
+    `<div><strong>${contacts.length}</strong><span>Verified named contacts</span></div>`,
+    `<div><strong>${accounts.reduce((n, account) => n + (account.sources || []).length, 0)}</strong><span>Live sources</span></div>`,
+    `<div><strong>${latestResults?.providers?.apollo ? '1' : '0'}</strong><span>Apollo enrichment</span></div>`
+  ].join('');
+
+  $('#accounts').innerHTML = accounts.map((account, i) => {
+    const accountContacts = account.contacts || [];
+    return `<article class="account"><div class="account-top"><div><span class="rank">MATCH ${String(i + 1).padStart(2, '0')}</span><h3>${account.name}</h3><p>${account.country} <span>·</span> ${account.commodity}</p></div><div class="score"><strong>${account.score}</strong><small>ICP score</small></div></div><div class="account-grid"><div><h4>Why it fits</h4><p>${account.fit}</p><h4>Evidence</h4><ul>${(account.signals || []).map(signal => `<li>${signal}</li>`).join('')}</ul></div><div><h4>Research brief</h4><p><b>Recent signal:</b> ${account.news}</p><p><b>FlytBase relevance:</b> ${account.tech}</p><div class="sources">${(account.sources || []).map(source => `<a target="_blank" rel="noreferrer" href="${source.url}">↗ ${source.label}</a>`).join('')}</div></div></div><div class="contacts"><h4>Target contacts</h4>${accountContacts.map((contact, j) => { const safe = !contact.name.startsWith('Contact'); const email = contact.email ? `<p><b>Email:</b> ${contact.email}</p>` : ''; const generated = contact.outreach ? `<div class="email"><div><span>GENERATED OUTREACH</span><b>Subject: ${contact.outreach.subject}</b></div><pre>${contact.outreach.body}</pre><p class="rationale">Personalization inputs: ${(contact.rationale || []).join(' ')}</p></div>` : '<p class="suppressed">No email generated. A named target contact must be confirmed from an authoritative public source before outreach is drafted.</p>'; return `<details ${safe && i === 0 && j === 0 ? 'open' : ''}><summary><span class="person">${safe ? contact.name : 'No verified persona'}</span><span>${contact.role}</span><span class="verified">${safe ? 'Verified' : 'Needs enrichment'}</span></summary><div class="contact-body"><p><b>Verification:</b> ${contact.verificationLink ? `<a target="_blank" rel="noreferrer" href="${contact.verificationLink}">${contact.verification}</a>` : contact.verification}</p>${email}${safe ? generated : '<p class="suppressed">No email generated. A named target contact must be confirmed from an authoritative public source before outreach is drafted.</p>'}</div></details>`; }).join('')}</div></article>`;
+  }).join('');
 }
-function setStages() { const stages = [...document.querySelectorAll('[data-stage]')]; stages.forEach(x => { x.className = ''; x.querySelector('em').textContent='Waiting'; }); stages.forEach((stage, index) => setTimeout(()=>{ stage.className='active'; stage.querySelector('em').textContent='Running'; setTimeout(()=>{ stage.className='done'; stage.querySelector('em').textContent='Complete'; if(index===stages.length-1) render(); }, 650); }, index*720)); }
-$('#run').addEventListener('click', () => { $('#run').disabled=true; $('#run').innerHTML='Running research...'; setStages(); setTimeout(()=>{$('#run').disabled=false; $('#run').innerHTML='<span class="play">↻</span> Run again';}, 3300); });
-$('#export').addEventListener('click', () => { const blob=new Blob([JSON.stringify({brief:{vertical:$('#vertical').value,reference:$('#reference').value,goal:$('#goal').value,angle:$('#angle').value},accounts},null,2)],{type:'application/json'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='prospect-engine-results.json';a.click();URL.revokeObjectURL(a.href); });
+
+function showError(message) {
+  $('#empty').hidden = false;
+  $('#results').hidden = true;
+  $('#empty h2').textContent = 'Research could not run';
+  $('#empty p').textContent = message;
+  setStatus('LIVE RESEARCH ERROR', 'error');
+  setPipelineState('error');
+}
+
+async function loadStatus() {
+  try {
+    const response = await fetch('/api/research-status');
+    const status = await response.json();
+    setStatus(status.liveResearchConfigured ? 'LIVE RESEARCH READY' : 'CONFIGURE TAVILY + APOLLO', status.liveResearchConfigured ? 'live' : 'config');
+  } catch {
+    setStatus('LIVE RESEARCH READY', 'ready');
+  }
+}
+
+async function runResearch() {
+  const brief = getBrief();
+  const button = $('#run');
+  latestResults = null;
+
+  if (!brief.vertical || !brief.reference || !brief.goal || !brief.angle) {
+    showError('Please fill in the campaign brief before running live research.');
+    return;
+  }
+
+  button.disabled = true;
+  button.innerHTML = 'Running live research...';
+  setStatus('RUNNING LIVE RESEARCH', 'live');
+  setPipelineState('running');
+
+  try {
+    const response = await fetch('/api/research', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(brief)
+    });
+
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.message || payload.error || 'Live research failed');
+
+    latestResults = payload;
+    renderAccounts(payload.accounts || []);
+    setPipelineState('done');
+    setStatus('LIVE RESEARCH COMPLETE', 'live');
+  } catch (error) {
+    showError(error instanceof Error ? error.message : 'Live research failed.');
+  } finally {
+    button.disabled = false;
+    button.innerHTML = '<span class="play">↻</span> Run again';
+  }
+}
+
+$('#run').addEventListener('click', runResearch);
+$('#export').addEventListener('click', () => {
+  if (!latestResults) return;
+  const blob = new Blob([JSON.stringify(latestResults, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'prospect-engine-results.json';
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+
+loadStatus();

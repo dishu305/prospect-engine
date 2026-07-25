@@ -50,4 +50,4 @@ The account cards show ICP scores of 94 for Vale, 91 for Nexa Resources, and 89 
 
 ## Notes And Limitations
 
-The current implementation uses a checked public-source research cache, which makes the demonstrated workflow repeatable. A production version would refresh account evidence through a compliant research/news provider and use a licensed enrichment provider where a verified target contact is unavailable. The current safe behavior remains the same: no inferred email addresses, invented people, or outreach draft for an unverified persona.
+The current implementation now runs as a live, input-driven research agent. It refreshes account evidence through Tavily and performs contact enrichment through Apollo when those environment variables are configured. The safe behavior remains the same: no inferred email addresses, invented people, or outreach draft for an unverified persona.

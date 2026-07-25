@@ -20,4 +20,4 @@ Open `http://localhost:3000`.
 
 ## Production research configuration
 
-The checked research cache powers the repeatable GitHub Pages demonstration. For a live-research deployment, deploy this project to Vercel and configure `TAVILY_API_KEY` for web research and `APOLLO_API_KEY` for licensed contact enrichment in the Vercel project environment variables. `api/research-status.js` reports whether those credentials are configured. Never commit real credentials.
+This app now runs as a live, input-driven research agent on Vercel. Configure `TAVILY_API_KEY` for web research and `APOLLO_API_KEY` for licensed contact enrichment in the Vercel project environment variables. `api/research-status.js` reports whether those credentials are configured. Never commit real credentials.
